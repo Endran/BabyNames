@@ -17,7 +17,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-        fab.setOnClickListener { Snackbar.make(it, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show() }
+
+        fab.setOnClickListener {
+            val e = BabyNameExtractor()
+            val extract = e.extract(resources)
+            Snackbar.make(it, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show() }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
