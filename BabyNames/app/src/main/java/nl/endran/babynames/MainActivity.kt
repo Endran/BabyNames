@@ -6,9 +6,10 @@ package nl.endran.babynames
 
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
+import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.app.AppCompatActivity
-import android.view.Menu
-import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -18,24 +19,31 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
+        viewPager.adapter = GameFragmentPagerAdapter(supportFragmentManager)
+        tabLayout.setupWithViewPager(viewPager)
+
         fab.setOnClickListener {
             val e = BabyNameExtractor()
             val extract = e.extract(resources)
-            Snackbar.make(it, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show() }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true
+            Snackbar.make(it, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show()
         }
-        return super.onOptionsItemSelected(item)
+    }
+
+    private inner class GameFragmentPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+
+        private val fragments: Array<Fragment> = arrayOf(
+                Fragment(), Fragment(), Fragment())
+
+        override fun getItem(position: Int): Fragment {
+            return fragments[position]
+        }
+
+        override fun getCount(): Int {
+            return fragments.size
+        }
+
+        override fun getPageTitle(position: Int): CharSequence {
+            return "Pos=$position"
+        }
     }
 }
