@@ -9,12 +9,11 @@ import com.google.gson.Gson
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
-class BabyNameExtractor {
+class BabyNameExtractor(val resources: Resources) {
 
-    fun extract(resources: Resources): BabyNames {
-        val raw = resources.openRawResource(R.raw.boy_names);
-        val reader = BufferedReader(InputStreamReader(raw));
-        val babyNames = Gson().fromJson(reader, BabyNames::class.java)
-        return babyNames
+    val babyNames: BabyNames by lazy {
+        Gson().fromJson(
+                BufferedReader(InputStreamReader(
+                        resources.openRawResource(R.raw.boy_names))), BabyNames::class.java)
     }
 }
