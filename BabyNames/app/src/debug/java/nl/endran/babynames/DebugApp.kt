@@ -4,16 +4,17 @@
 
 package nl.endran.babynames
 
-import android.app.Application
+import com.facebook.stetho.Stetho
 import timber.log.Timber
 
-class App : Application() {
+class DebugApp : App() {
 
     override fun onCreate() {
         super.onCreate()
 
-        if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree());
-        }
+        Stetho.initializeWithDefaults(this)
+
+        Timber.plant(Timber.DebugTree())
+//        Timber.plant(StethoTree())
     }
 }

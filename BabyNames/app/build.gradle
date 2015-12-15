@@ -4,24 +4,46 @@
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'com.neenbedankt.android-apt'
+apply plugin: 'io.fabric'
+
+Properties props = new Properties()
+try {
+    props.load(file('private.properties').newDataInputStream())
+} catch (Exception ex) {
+}
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    compileSdkVersion _compileSdkVersion
+    buildToolsVersion _buildToolsVersion
 
     defaultConfig {
         applicationId "nl.endran.babynames"
-        minSdkVersion 15
-        targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion _minSdkVersion
+        targetSdkVersion _targetSdkVersion
+        versionCode _versionCode
+        versionName "0.1.0 (${getDetails()})"
     }
+
+
+
+    signingConfigs {
+        release {
+            storeFile project.rootProject.file('keystore.jks')
+            storePassword props.getProperty("storePassword")
+            keyAlias props.getProperty("keyAlias")
+            keyPassword props.getProperty("keyPassword")
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
+
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
@@ -30,21 +52,37 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'com.android.support:appcompat-v7:23.1.1'
-    compile 'com.android.support:design:23.1.1'
+    compile "com.android.support:appcompat-v7:${appCompatVersion}"
+    compile "com.android.support:design:${appCompatVersion}"
 
-    compile 'com.jakewharton.timber:timber:4.1.0'
 
-    compile 'com.google.code.gson:gson:2.5'
+    compile "com.google.code.gson:gson:${gsonVersion}"
 
-    compile 'io.reactivex:rxjava:1.0.16'
-    compile 'io.reactivex:rxkotlin:0.30.1'
-    compile 'io.reactivex:rxandroid:1.0.1'
-    compile 'com.jakewharton.rxbinding:rxbinding-kotlin:0.3.0'
+    compile("com.crashlytics.sdk.android:crashlytics:${crashlyticsVersion}@aar") {
+        transitive = true;
+    }
+
+    compile "com.google.dagger:dagger:${daggerVersion}"
+    apt "com.google.dagger:dagger-compiler:${daggerVersion}"
+    provided "org.glassfish:javax.annotation:${javaxAnnotationVersion}"
+
+    compile("de.psdev.licensesdialog:licensesdialog:${licenseDialogVersion}") {
+        exclude module: 'support-v4'
+    }
+
+    debugCompile "com.facebook.stetho:stetho:${stethoVersion}"
+    debugCompile "com.facebook.stetho:stetho-urlconnection:${stethoVersion}"
+    compile "com.jakewharton.timber:timber:${timberVersion}"
+//    debugCompile "com.facebook.stetho:stetho-timber:${stethoVersion}"
+
+    compile "io.reactivex:rxjava:${rxJavaVersion}"
+    compile "io.reactivex:rxkotlin:${rxKotlinVersion}"
+    compile "io.reactivex:rxandroid:${rxAndroidVersion}"
+    compile "com.jakewharton.rxbinding:rxbinding-kotlin:${rxBindingVersion}"
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-    testCompile 'junit:junit:4.12'
+    testCompile "junit:junit:${jUnitVersion}"
 }
 buildscript {
     ext.kotlin_version = '1.0.0-beta-3595'
@@ -56,6 +94,13 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-android-extensions:$kotlin_version"
     }
 }
+
 repositories {
     mavenCentral()
+}
+
+def getDetails() {
+    def details = """git rev-parse --short HEAD""".execute().text.trim()
+    def workingBranch = """git rev-parse --abbrev-ref HEAD""".execute().text.trim()
+    return details + ' ' + workingBranch
 }
