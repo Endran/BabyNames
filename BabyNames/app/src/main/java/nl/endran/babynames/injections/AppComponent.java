@@ -8,6 +8,7 @@ import javax.inject.Singleton;
 
 import dagger.Component;
 import nl.endran.babynames.App;
+import nl.endran.babynames.BabyNameExtractor;
 import nl.endran.babynames.MainActivity;
 import nl.endran.babynames.tracking.Tracking;
 
@@ -20,4 +21,6 @@ public interface AppComponent {
     void inject(MainActivity mainActivity);
 
     Tracking getTracking();
+
+    BabyNameExtractor getBabyNameExtractor();
 }

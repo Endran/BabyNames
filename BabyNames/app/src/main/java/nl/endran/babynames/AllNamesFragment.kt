@@ -13,7 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import kotlinx.android.synthetic.main.fragment_names.*
-import timber.log.Timber
+import nl.endran.babynames.injections.getAppComponent
 
 class AllNamesFragment : Fragment() {
 
@@ -24,17 +24,28 @@ class AllNamesFragment : Fragment() {
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val extractor = BabyNameExtractor(resources)
+        val appComponent = context.getAppComponent()
+        val extractor = appComponent.babyNameExtractor
         val adapter = NamesAdapter()
+
+        //        extractor.babyNames.names.toObservable()
+        //                .skip(20)
+        //                .delay(200, TimeUnit.MILLISECONDS)
+        //                .take(40)
+        //                .observeOn(AndroidSchedulers.mainThread())
+        //                .subscribe {
+        //                    adapter.names.add(it)
+        //                    adapter.notifyItemInserted(adapter.names.size - 1)
+        //                }
+
         adapter.names = extractor.babyNames.names
 
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = adapter
-        adapter.notifyDataSetChanged()
     }
 
     private inner class NamesAdapter : RecyclerView.Adapter<NamesAdapter.ViewHolder>() {
-        var names: List<BabyName> = listOf()
+        var names: MutableList<BabyName> = arrayListOf()
 
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder? {
             val view = LayoutInflater.from(context).inflate(R.layout.row_item_name, parent, false)
@@ -50,7 +61,7 @@ class AllNamesFragment : Fragment() {
         }
 
         inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            val textView : TextView
+            val textView: TextView
 
             init {
                 textView = itemView.findViewById(R.id.textView) as TextView

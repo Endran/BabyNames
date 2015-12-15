@@ -8,8 +8,9 @@ import android.content.res.Resources
 import com.google.gson.Gson
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import javax.inject.Inject
 
-class BabyNameExtractor(val resources: Resources) {
+class BabyNameExtractor @Inject constructor(val resources: Resources) {
 
     val babyNames: BabyNames by lazy {
         Gson().fromJson(
