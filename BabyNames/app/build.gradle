@@ -79,6 +79,7 @@ dependencies {
     compile "io.reactivex:rxkotlin:${rxKotlinVersion}"
     compile "io.reactivex:rxandroid:${rxAndroidVersion}"
     compile "com.jakewharton.rxbinding:rxbinding-kotlin:${rxBindingVersion}"
+    compile "com.jakewharton.rxbinding:rxbinding-recyclerview-v7:${rxBindingVersion}"
     compile "com.f2prateek.rx.preferences:rx-preferences:${rxPreferencesVersion}"
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
