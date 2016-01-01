@@ -11,7 +11,6 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerViewAdapter
 import kotlinx.android.synthetic.main.fragment_names.*
 import kotlinx.android.synthetic.main.row_item_name.view.*
 import nl.endran.babynames.injections.getAppComponent
@@ -30,9 +29,6 @@ class AllNamesFragment : Fragment() {
 
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = adapter
-
-//        RxRecyclerViewAdapter.dataChanges(adapter)
-//            .subscribe {  }
     }
 
 
@@ -69,8 +65,16 @@ class AllNamesFragment : Fragment() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val name = names[position]
 
-            holder.itemView.textView.text = name
-            holder.itemView.checkbox.isChecked = presenter?.isFavorite(name) ?: false
+            val itemView = holder.itemView
+            itemView.textView.text = name
+
+            val checkbox = itemView.checkbox
+            checkbox.isClickable = false
+            checkbox.isChecked = presenter?.isFavorite(name) ?: false
+            itemView.setOnClickListener {
+                presenter?.toggleFavorite(name)
+                checkbox.isChecked = presenter?.isFavorite(name) ?: false
+            }
         }
 
         inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {}

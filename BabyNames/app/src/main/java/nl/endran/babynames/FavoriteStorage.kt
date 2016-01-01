@@ -17,10 +17,11 @@ class FavoriteStorage @Inject constructor(context: Context) {
     }
 
     fun isFavorite(name: String): Boolean {
-        return preferences.getBoolean(name, false)
+        val favorite = preferences.getBoolean(name, false)
+        return favorite
     }
 
-    fun setFavorite(name: String, isFavorite: Boolean) {
-        preferences.edit().putBoolean(name, isFavorite).apply()
+    fun toggleFavorite(name: String) {
+        preferences.edit().putBoolean(name, !isFavorite(name)).apply()
     }
 }

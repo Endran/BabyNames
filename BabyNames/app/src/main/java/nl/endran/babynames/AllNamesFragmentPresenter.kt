@@ -27,4 +27,8 @@ class AllNamesFragmentPresenter @Inject constructor(
     fun isFavorite(name: String): Boolean {
         return favoriteStorage.isFavorite(name)
     }
+
+    fun toggleFavorite(name: String) {
+        favoriteStorage.toggleFavorite(name)
+    }
 }
