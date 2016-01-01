@@ -18,7 +18,7 @@ import nl.endran.babynames.injections.getAppComponent
 
 class AllNamesFragment : Fragment() {
 
-    private val adapter = AllNamesFragment.NamesAdapter()
+    private val adapter = NamesAdapter()
     private var presenter: AllNamesFragmentPresenter? = null
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -56,7 +56,7 @@ class AllNamesFragment : Fragment() {
 
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder? {
             val view = LayoutInflater.from(context).inflate(R.layout.row_item_name, parent, false)
-            return NamesAdapter.ViewHolder(view)
+            return ViewHolder(view)
         }
 
         override fun getItemCount(): Int {
