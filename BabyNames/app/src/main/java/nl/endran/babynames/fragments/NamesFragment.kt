@@ -16,10 +16,31 @@ import kotlinx.android.synthetic.main.row_item_name.view.*
 import nl.endran.babynames.R
 import nl.endran.babynames.injections.getAppComponent
 
-class AllNamesFragment : Fragment() {
+class NamesFragment : Fragment() {
+
+    companion object {
+
+        val TYPE_KEY = "TYPE_KEY"
+
+        fun createFragment(type: Type): NamesFragment {
+            val fragment = NamesFragment()
+            fragment.arguments = Bundle()
+            fragment.arguments.putInt(TYPE_KEY, type.ordinal)
+            return fragment
+        }
+
+        fun getType(arguments: Bundle): Type {
+            val typeOrdinal = arguments.getInt(TYPE_KEY, 0)
+            return Type.values()[typeOrdinal]
+        }
+    }
+
+    public enum class Type {
+        ALPHABET, POPULARITY, FAVORITES
+    }
 
     private val adapter = NamesAdapter()
-    private var presenter: AllNamesFragmentPresenter? = null
+    private var presenter: NamesFragmentPresenter? = null
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater?.inflate(R.layout.fragment_names, container, false)
@@ -38,7 +59,7 @@ class AllNamesFragment : Fragment() {
 
         val appComponent = context.getAppComponent()
         presenter = appComponent.allNamesFragmentPresenter
-        presenter?.start(this)
+        presenter?.start(this, getType(arguments))
     }
 
     override fun onPause() {
