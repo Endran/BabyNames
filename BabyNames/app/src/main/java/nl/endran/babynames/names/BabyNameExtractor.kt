@@ -2,10 +2,11 @@
  * Copyright (c) 2015 by David Hardy. Licensed under the Apache License, Version 2.0.
  */
 
-package nl.endran.babynames
+package nl.endran.babynames.names
 
 import android.content.res.Resources
 import com.google.gson.Gson
+import nl.endran.babynames.R
 import rx.lang.kotlin.toObservable
 import java.io.BufferedReader
 import java.io.InputStreamReader

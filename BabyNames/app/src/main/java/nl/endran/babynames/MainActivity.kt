@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
+import nl.endran.babynames.fragments.AllNamesFragment
 
 class MainActivity : AppCompatActivity() {
 

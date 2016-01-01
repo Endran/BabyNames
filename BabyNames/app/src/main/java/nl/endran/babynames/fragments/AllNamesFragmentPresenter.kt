@@ -2,8 +2,10 @@
  * Copyright (c) 2015 by David Hardy. Licensed under the Apache License, Version 2.0.
  */
 
-package nl.endran.babynames
+package nl.endran.babynames.fragments
 
+import nl.endran.babynames.names.BabyNameExtractor
+import nl.endran.babynames.util.FavoriteStorage
 import rx.android.schedulers.AndroidSchedulers
 import rx.lang.kotlin.toObservable
 import javax.inject.Inject

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 by David Hardy. Licensed under the Apache License, Version 2.0.
  */
 
-package nl.endran.babynames
+package nl.endran.babynames.fragments
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -13,11 +13,12 @@ import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_names.*
 import kotlinx.android.synthetic.main.row_item_name.view.*
+import nl.endran.babynames.R
 import nl.endran.babynames.injections.getAppComponent
 
 class AllNamesFragment : Fragment() {
 
-    private val adapter = NamesAdapter()
+    private val adapter = AllNamesFragment.NamesAdapter()
     private var presenter: AllNamesFragmentPresenter? = null
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -55,7 +56,7 @@ class AllNamesFragment : Fragment() {
 
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder? {
             val view = LayoutInflater.from(context).inflate(R.layout.row_item_name, parent, false)
-            return ViewHolder(view)
+            return NamesAdapter.ViewHolder(view)
         }
 
         override fun getItemCount(): Int {
