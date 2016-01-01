@@ -11,9 +11,10 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import kotlinx.android.synthetic.main.fragment_names.*
+import kotlinx.android.synthetic.main.row_item_name.view.*
 import nl.endran.babynames.injections.getAppComponent
+import kotlin.collections.arrayListOf
 
 class AllNamesFragment : Fragment() {
 
@@ -57,15 +58,10 @@ class AllNamesFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.textView.text = names[position].name
+            holder.itemView.textView.text = names[position].name
+            holder.itemView.checkbox.isChecked = position % 2 == 1
         }
 
-        inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            val textView: TextView
-
-            init {
-                textView = itemView.findViewById(R.id.textView) as TextView
-            }
-        }
+        inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {}
     }
 }
