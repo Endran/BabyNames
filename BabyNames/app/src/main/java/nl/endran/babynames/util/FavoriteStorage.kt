@@ -5,39 +5,33 @@
 package nl.endran.babynames.util
 
 import android.content.Context
-import android.content.SharedPreferences
+import com.f2prateek.rx.preferences.Preference
 import com.f2prateek.rx.preferences.RxSharedPreferences
+import rx.lang.kotlin.toObservable
 import javax.inject.Inject
 
 class FavoriteStorage @Inject constructor(context: Context) {
 
-    val FAVORITE_KEYS = "FAVORITE_KEYS"
-    val FAVORITE_STORAGE = "FAVORITE_STORAGE"
-    val preferences: SharedPreferences
-//    val favoritesObservable: SharedPreferences
+    val favoritesObservable: Preference<Set<String>>
 
     init {
-        preferences = context.getSharedPreferences(FAVORITE_STORAGE, Context.MODE_PRIVATE)
+        val preferences = context.getSharedPreferences("FAVORITE_STORAGE", Context.MODE_PRIVATE)
         val rxSharedPreferences = RxSharedPreferences.create(preferences)
-        val favoritesObservable = rxSharedPreferences.getStringSet(FAVORITE_KEYS)
+        favoritesObservable = rxSharedPreferences.getStringSet("FAVORITE_KEYS", hashSetOf(""))
     }
 
     fun isFavorite(name: String): Boolean {
-        val favorites = getFavorites()
-        return favorites?.contains(name) ?: false
+        return favoritesObservable.get().contains(name)
     }
-
 
     fun toggleFavorite(name: String) {
-        val favorites = getFavorites()
-        if (isFavorite(name)) {
-            favorites.remove(name)
-        } else {
-            favorites.add(name)
-        }
+        var favorites = favoritesObservable.get()
 
-        preferences.edit().putStringSet(FAVORITE_KEYS, favorites).apply()
+        favorites.toObservable()
+                .contains(name)
+                .subscribe {
+                    favorites = if (it) favorites.minus(name) else favorites.plus(name)
+                    favoritesObservable.set(favorites)
+                }
     }
-
-    private fun getFavorites() = preferences.getStringSet(FAVORITE_KEYS, hashSetOf())
 }
