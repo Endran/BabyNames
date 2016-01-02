@@ -69,7 +69,27 @@ class NamesFragment : Fragment() {
     }
 
     fun showNames(names: MutableList<String>) {
-        adapter.names = names
+        if (adapter.names.isEmpty() || adapter.names.size == names.size) {
+            adapter.names = names
+            adapter.notifyDataSetChanged()
+        } else if (adapter.names.size > names.size) {
+            var itemsRemoved = 0
+            for (i in adapter.names.indices) {
+                if (!names.contains(adapter.names[i-itemsRemoved])) {
+                    adapter.names.removeAt(i-itemsRemoved)
+                    adapter.notifyItemRemoved(i-itemsRemoved)
+                    itemsRemoved++
+                }
+            }
+        } else if (adapter.names.size < names.size) {
+            names.forEach {
+                if (!adapter.names.contains(it)) {
+                    val index = names.indexOf(it)
+                    adapter.names.add(index, it)
+                    adapter.notifyItemInserted(index)
+                }
+            }
+        }
     }
 
     private inner class NamesAdapter : RecyclerView.Adapter<NamesAdapter.ViewHolder>() {
