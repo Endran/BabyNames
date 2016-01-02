@@ -31,13 +31,12 @@ class MainActivity : AppCompatActivity() {
 
     private inner class GameFragmentPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
-        // All, Populair, Favo
         // Fab: Search
         // Menu: Share, Export, Gender
 
         private val fragments: Array<Fragment> = arrayOf(
-                NamesFragment.createFragment(NamesFragment.Type.ALPHABET),
                 NamesFragment.createFragment(NamesFragment.Type.POPULARITY),
+                NamesFragment.createFragment(NamesFragment.Type.ALPHABET),
                 NamesFragment.createFragment(NamesFragment.Type.FAVORITES))
 
         override fun getItem(position: Int): Fragment {
@@ -49,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun getPageTitle(position: Int): CharSequence {
-            return "Pos=$position"
+            return "${NamesFragment.getType(fragments[position].arguments)}"
         }
     }
 }

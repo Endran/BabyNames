@@ -8,22 +8,45 @@ import nl.endran.babynames.names.BabyName
 import nl.endran.babynames.names.BabyNameExtractor
 import nl.endran.babynames.util.FavoriteStorage
 import rx.Observable
+import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 import rx.lang.kotlin.toObservable
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class NamesFragmentPresenter @Inject constructor(
         val babyNameExtractor: BabyNameExtractor,
         val favoriteStorage: FavoriteStorage) {
 
-    fun start(fragment: NamesFragment, type: NamesFragment.Type) {
-        val names = babyNameExtractor.babyNames.names
-        observable(type, names)
-                ?.subscribeOn(AndroidSchedulers.mainThread())
-                ?.subscribe { fragment.showNames(it) }
+    private var namesFragment: NamesFragment? = null
+    private var type = NamesFragment.Type.POPULARITY
+    private var favoriteSubscription: Subscription? = null
+
+    fun start(namesFragment: NamesFragment, type: NamesFragment.Type) {
+        this.namesFragment = namesFragment
+        this.type = type
+
+//        favoriteSubscription = favoriteStorage.updateObservable
+//                .subscribe { updateUI() }
+        updateUI()
     }
 
-    private fun observable(type: NamesFragment.Type, names: MutableList<BabyName>): Observable<MutableList<String>>? {
+    fun stop() {
+        favoriteSubscription?.unsubscribe()
+        favoriteSubscription = null
+        namesFragment = null
+    }
+
+    private fun updateUI() {
+        val names = babyNameExtractor.babyNames.names
+        getObservableForType(names)
+                ?.subscribeOn(AndroidSchedulers.mainThread())
+                ?.subscribe { namesFragment?.showNames(it) }
+        return
+    }
+
+    private fun getObservableForType(names: MutableList<BabyName>): Observable<MutableList<String>>? {
         var observable: Observable<MutableList<String>>?
 
         when (type) {
@@ -46,9 +69,6 @@ class NamesFragmentPresenter @Inject constructor(
         }
 
         return observable
-    }
-
-    fun stop() {
     }
 
     fun isFavorite(name: String): Boolean {
