@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentPagerAdapter
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import nl.endran.babynames.fragments.NamesFragment
+import nl.endran.babynames.fragments.NamesUtilFactory
 
 class MainActivity : RxAppCompatActivity() {
 
@@ -35,9 +36,9 @@ class MainActivity : RxAppCompatActivity() {
         // Menu: Share, Export, Gender
 
         private val fragments: Array<Fragment> = arrayOf(
-                NamesFragment.createFragment(NamesFragment.Type.POPULARITY),
-                NamesFragment.createFragment(NamesFragment.Type.ALPHABET),
-                NamesFragment.createFragment(NamesFragment.Type.FAVORITES))
+                NamesFragment.createFragment(NamesUtilFactory.Type.POPULARITY),
+                NamesFragment.createFragment(NamesUtilFactory.Type.ALPHABET),
+                NamesFragment.createFragment(NamesUtilFactory.Type.FAVORITES))
 
         override fun getItem(position: Int): Fragment {
             return fragments[position]

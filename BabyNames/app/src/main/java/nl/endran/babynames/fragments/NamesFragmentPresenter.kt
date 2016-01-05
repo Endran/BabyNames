@@ -4,30 +4,28 @@
 
 package nl.endran.babynames.fragments
 
+import com.f2prateek.rx.preferences.Preference
 import nl.endran.babynames.names.BabyName
-import nl.endran.babynames.names.BabyNameExtractor
 import nl.endran.babynames.util.FavoriteStorage
 import rx.Observable
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
-import rx.lang.kotlin.toObservable
-import rx.schedulers.Schedulers
-import javax.inject.Inject
 
-class NamesFragmentPresenter @Inject constructor(
-        val babyNameExtractor: BabyNameExtractor,
+class NamesFragmentPresenter constructor(
+        val babyNameObservable: Observable<MutableList<BabyName>>,
+        val favoritesObservable: Preference<Set<String>>,
         val favoriteStorage: FavoriteStorage) {
 
     private var namesFragment: NamesFragment? = null
-    private var type = NamesFragment.Type.POPULARITY
     private var favoriteSubscription: Subscription? = null
 
-    fun start(namesFragment: NamesFragment, type: NamesFragment.Type) {
+    fun start(namesFragment: NamesFragment) {
         this.namesFragment = namesFragment
-        this.type = type
 
-        favoriteStorage.favoritesObservable.asObservable()
+        favoritesObservable
+                .asObservable()
                 .subscribe { updateUI() }
+
         updateUI()
     }
 
@@ -38,41 +36,12 @@ class NamesFragmentPresenter @Inject constructor(
     }
 
     private fun updateUI() {
-        val names = babyNameExtractor.babyNames.names
-        getObservableForType(names)
-                ?.observeOn(AndroidSchedulers.mainThread())
-                ?.subscribe {
+        babyNameObservable
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
                     namesFragment?.showNames(it)
                 }
         return
-    }
-
-    private fun getObservableForType(names: MutableList<BabyName>): Observable<MutableList<String>>? {
-        var observable: Observable<MutableList<String>>?
-
-        val babyNameObservable = names.toObservable()
-                .subscribeOn(Schedulers.computation())
-
-        when (type) {
-            NamesFragment.Type.ALPHABET ->
-                observable = babyNameObservable
-                        .map { it.name }
-                        .toSortedList { name1, name2 -> name1.compareTo(name2) }
-            NamesFragment.Type.POPULARITY ->
-                observable = babyNameObservable
-                        .toSortedList { babyName1, babyName2 -> babyName1.place - babyName2.place }
-                        .flatMap { it.toObservable() }
-                        .map { it.name }
-                        .toList()
-            NamesFragment.Type.FAVORITES ->
-                observable = babyNameObservable
-                        .map { it.name }
-                        .filter { favoriteStorage.isFavorite(it) }
-                        .toSortedList { name1, name2 -> name1.compareTo(name2) }
-            else -> observable = null
-        }
-
-        return observable
     }
 
     fun isFavorite(name: String): Boolean {

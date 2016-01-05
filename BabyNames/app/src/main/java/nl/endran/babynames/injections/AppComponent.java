@@ -7,9 +7,9 @@ package nl.endran.babynames.injections;
 import javax.inject.Singleton;
 
 import dagger.Component;
-import nl.endran.babynames.fragments.NamesFragmentPresenter;
 import nl.endran.babynames.App;
 import nl.endran.babynames.MainActivity;
+import nl.endran.babynames.fragments.NamesUtilFactory;
 import nl.endran.babynames.tracking.Tracking;
 
 @Singleton
@@ -22,5 +22,5 @@ public interface AppComponent {
 
     Tracking getTracking();
 
-    NamesFragmentPresenter getAllNamesFragmentPresenter();
+    NamesUtilFactory getNamesUtilFactory();
 }

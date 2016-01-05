@@ -16,6 +16,7 @@ import kotlinx.android.synthetic.main.fragment_names.*
 import kotlinx.android.synthetic.main.row_item_name.view.*
 import nl.endran.babynames.R
 import nl.endran.babynames.injections.getAppComponent
+import nl.endran.babynames.names.BabyName
 
 class NamesFragment : RxFragment() {
 
@@ -23,22 +24,19 @@ class NamesFragment : RxFragment() {
 
         val TYPE_KEY = "TYPE_KEY"
 
-        fun createFragment(type: Type): NamesFragment {
+        fun createFragment(type: NamesUtilFactory.Type): NamesFragment {
             val fragment = NamesFragment()
             fragment.arguments = Bundle()
             fragment.arguments.putInt(TYPE_KEY, type.ordinal)
             return fragment
         }
 
-        fun getType(arguments: Bundle): Type {
+        fun getType(arguments: Bundle): NamesUtilFactory.Type {
             val typeOrdinal = arguments.getInt(TYPE_KEY, 0)
-            return Type.values()[typeOrdinal]
+            return NamesUtilFactory.Type.values()[typeOrdinal]
         }
     }
 
-    public enum class Type {
-        ALPHABET, POPULARITY, FAVORITES
-    }
 
     private val adapter = NamesAdapter()
     private var presenter: NamesFragmentPresenter? = null
@@ -68,8 +66,9 @@ class NamesFragment : RxFragment() {
         super.onResume()
 
         val appComponent = context.getAppComponent()
-        presenter = appComponent.allNamesFragmentPresenter
-        presenter?.start(this, getType(arguments))
+        val namesUtilFactory = appComponent.namesUtilFactory
+        presenter = namesUtilFactory.createPresenter(getType(arguments))
+        presenter?.start(this)
     }
 
     override fun onPause() {
@@ -78,14 +77,16 @@ class NamesFragment : RxFragment() {
         presenter = null
     }
 
-    fun showNames(names: MutableList<String>) {
+    fun showNames(names: MutableList<BabyName>) {
         if (adapter.names.isEmpty() || adapter.names.size == names.size) {
             adapter.names = names
             adapter.notifyDataSetChanged()
         } else if (adapter.names.size > names.size) {
             var itemsRemoved = 0
             for (i in adapter.names.indices) {
-                if (!names.contains(adapter.names[i - itemsRemoved])) {
+                if (names
+                        .filter { it.name == adapter.names[i - itemsRemoved].name }
+                        .isNotEmpty()) {
                     adapter.names.removeAt(i - itemsRemoved)
                     adapter.notifyItemRemoved(i - itemsRemoved)
                     itemsRemoved++
@@ -103,7 +104,7 @@ class NamesFragment : RxFragment() {
     }
 
     private inner class NamesAdapter : RecyclerView.Adapter<NamesAdapter.ViewHolder>(), SectionIndexer {
-        var names: MutableList<String> = arrayListOf()
+        var names: MutableList<BabyName> = arrayListOf()
 
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder? {
             val view = LayoutInflater.from(context).inflate(R.layout.row_item_name, parent, false)
@@ -118,14 +119,14 @@ class NamesFragment : RxFragment() {
             val name = names[position]
 
             val itemView = holder.itemView
-            itemView.textView.text = name
+            itemView.textView.text = name.name
 
             val checkbox = itemView.checkbox
             checkbox.isClickable = false
-            checkbox.isChecked = presenter?.isFavorite(name) ?: false
+            checkbox.isChecked = presenter?.isFavorite(name.name) ?: false
             itemView.setOnClickListener {
-                presenter?.toggleFavorite(name)
-                checkbox.isChecked = presenter?.isFavorite(name) ?: false
+                presenter?.toggleFavorite(name.name)
+                checkbox.isChecked = presenter?.isFavorite(name.name) ?: false
             }
         }
 
@@ -134,10 +135,7 @@ class NamesFragment : RxFragment() {
                 return 26
             }
 
-            val s = names[position]
-            val element = s.first()
-            val sections = sections!!
-            val indexOf = sections.indexOf(element)
+            val indexOf = sections!!.indexOf(names[position].name.first())
             return if (indexOf >= 0 && indexOf < 26) indexOf else 26
         }
 
