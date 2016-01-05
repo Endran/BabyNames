@@ -15,7 +15,7 @@
 
     <xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller
         android:id="@+id/fastScroller"
-        android:layout_width="16dp"
+        android:layout_width="@dimen/fast_scroll_width"
         android:layout_height="match_parent"
         android:layout_alignParentEnd="true"
         recyclerviewfastscroller:rfs_handleColor="@color/colorAccent"/>

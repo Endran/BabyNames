@@ -3,20 +3,21 @@
   ~ Copyright (c) 2015 by David Hardy. Licensed under the Apache License, Version 2.0.
   -->
 
-<manifest package="nl.endran.babynames"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest
+    package="nl.endran.babynames"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:name=".App"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/BabyNames">
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/BabyNames.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
