@@ -10,10 +10,8 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.SectionIndexer
 import com.trello.rxlifecycle.components.support.RxFragment
 import kotlinx.android.synthetic.main.fragment_names.*
-import kotlinx.android.synthetic.main.row_item_name.view.*
 import nl.endran.babynames.R
 import nl.endran.babynames.SectionIndicator
 import nl.endran.babynames.injections.getAppComponent
@@ -43,11 +41,14 @@ class NamesFragment : RxFragment() {
     private var presenter: NamesFragmentPresenter? = null
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater?.inflate(R.layout.fragment_names, container, false)
+        val view = inflater!!.inflate(R.layout.fragment_names, container, false)
 
-        val fastScroller = view!!.findViewById(R.id.fastScroller) as VerticalRecyclerViewFastScroller
-        val recyclerView = view!!.findViewById(R.id.recyclerView) as RecyclerView
-        val sectionIndicator = view!!.findViewById(R.id.sectionIndicator) as SectionIndicator
+        val fastScroller = view.findViewById(R.id.fastScroller) as VerticalRecyclerViewFastScroller
+        val recyclerView = view.findViewById(R.id.recyclerView) as RecyclerView
+        val sectionIndicator = view.findViewById(R.id.sectionIndicator) as SectionIndicator
+
+        adapter.isFavorite = { presenter?.isFavorite(it) ?: false }
+        adapter.toggleFavorite = { presenter?.toggleFavorite(it) }
 
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = adapter
@@ -82,75 +83,40 @@ class NamesFragment : RxFragment() {
 
     fun showNames(names: MutableList<BabyName>) {
         if (adapter.names.isEmpty() || adapter.names.size == names.size) {
-            adapter.names = names
-            adapter.notifyDataSetChanged()
+            showAllNames(names)
         } else if (adapter.names.size > names.size) {
-            var itemsRemoved = 0
-            for (i in adapter.names.indices) {
-                if (names
-                        .filter { it.name == adapter.names[i - itemsRemoved].name }
-                        .isNotEmpty()) {
-                    adapter.names.removeAt(i - itemsRemoved)
-                    adapter.notifyItemRemoved(i - itemsRemoved)
-                    itemsRemoved++
-                }
-            }
+            removeMissingNames(names)
         } else if (adapter.names.size < names.size) {
-            names.forEach {
-                if (!adapter.names.contains(it)) {
-                    val index = names.indexOf(it)
-                    adapter.names.add(index, it)
-                    adapter.notifyItemInserted(index)
-                }
+            addNewNames(names)
+        }
+    }
+
+    private fun addNewNames(names: MutableList<BabyName>) {
+        names.forEach {
+            if (!adapter.names.contains(it)) {
+                val index = names.indexOf(it)
+                adapter.names.add(index, it)
+                adapter.notifyItemInserted(index)
             }
         }
     }
 
-    private inner class NamesAdapter : RecyclerView.Adapter<NamesAdapter.ViewHolder>(), SectionIndexer {
-        var names: MutableList<BabyName> = arrayListOf()
-
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder? {
-            val view = LayoutInflater.from(context).inflate(R.layout.row_item_name, parent, false)
-            return ViewHolder(view)
-        }
-
-        override fun getItemCount(): Int {
-            return names.size
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val name = names[position]
-
-            val itemView = holder.itemView
-            itemView.textView.text = name.name
-
-            val checkbox = itemView.checkbox
-            checkbox.isClickable = false
-            checkbox.isChecked = presenter?.isFavorite(name.name) ?: false
-            itemView.setOnClickListener {
-                presenter?.toggleFavorite(name.name)
-                checkbox.isChecked = presenter?.isFavorite(name.name) ?: false
+    private fun removeMissingNames(names: MutableList<BabyName>) {
+        var itemsRemoved = 0
+        for (i in adapter.names.indices) {
+            if (names
+                    .filter { it.name == adapter.names[i - itemsRemoved].name }
+                    .isEmpty()) {
+                adapter.names.removeAt(i - itemsRemoved)
+                adapter.notifyItemRemoved(i - itemsRemoved)
+                itemsRemoved++
             }
         }
-
-        override fun getSectionForPosition(position: Int): Int {
-            if (position >= names.size) {
-                return 26
-            }
-
-            val indexOf = sections!!.indexOf(names[position].name.first())
-            return if (indexOf >= 0 && indexOf < 26) indexOf else 26
-        }
-
-        override fun getSections(): Array<out Any>? {
-            return arrayOf('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-                    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '#')
-        }
-
-        override fun getPositionForSection(sectionIndex: Int): Int {
-            return 0
-        }
-
-        inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {}
     }
+
+    private fun showAllNames(names: MutableList<BabyName>) {
+        adapter.names = names
+        adapter.notifyDataSetChanged()
+    }
+
 }
