@@ -8,18 +8,18 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
-import android.support.v7.app.AppCompatActivity
+import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import nl.endran.babynames.fragments.NamesFragment
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : RxAppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        viewPager.adapter = GameFragmentPagerAdapter(supportFragmentManager)
+        viewPager.adapter = PagerAdapter(supportFragmentManager)
         tabLayout.setupWithViewPager(viewPager)
 
         //        fab.setOnClickListener {
@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
         //        }
     }
 
-    private inner class GameFragmentPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+    private inner class PagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
         // Fab: Search
         // Menu: Share, Export, Gender

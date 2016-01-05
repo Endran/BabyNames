@@ -5,18 +5,19 @@
 package nl.endran.babynames.fragments
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SectionIndexer
+import com.trello.rxlifecycle.components.support.RxFragment
 import kotlinx.android.synthetic.main.fragment_names.*
 import kotlinx.android.synthetic.main.row_item_name.view.*
 import nl.endran.babynames.R
 import nl.endran.babynames.injections.getAppComponent
 
-class NamesFragment : Fragment() {
+class NamesFragment : RxFragment() {
 
     companion object {
 
@@ -51,8 +52,17 @@ class NamesFragment : Fragment() {
 
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = adapter
+
+        fastScroller.setRecyclerView(recyclerView);
+        fastScroller.sectionIndicator = sectionIndicator;
+
+        // Connect the scroller to the recycler (to let the recycler scroll the scroller's handle)
     }
 
+    override fun onDestroyView() {
+        recyclerView.removeOnScrollListener(fastScroller.onScrollListener);
+        super.onDestroyView()
+    }
 
     override fun onResume() {
         super.onResume()
@@ -75,9 +85,9 @@ class NamesFragment : Fragment() {
         } else if (adapter.names.size > names.size) {
             var itemsRemoved = 0
             for (i in adapter.names.indices) {
-                if (!names.contains(adapter.names[i-itemsRemoved])) {
-                    adapter.names.removeAt(i-itemsRemoved)
-                    adapter.notifyItemRemoved(i-itemsRemoved)
+                if (!names.contains(adapter.names[i - itemsRemoved])) {
+                    adapter.names.removeAt(i - itemsRemoved)
+                    adapter.notifyItemRemoved(i - itemsRemoved)
                     itemsRemoved++
                 }
             }
@@ -92,7 +102,7 @@ class NamesFragment : Fragment() {
         }
     }
 
-    private inner class NamesAdapter : RecyclerView.Adapter<NamesAdapter.ViewHolder>() {
+    private inner class NamesAdapter : RecyclerView.Adapter<NamesAdapter.ViewHolder>(), SectionIndexer {
         var names: MutableList<String> = arrayListOf()
 
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder? {
@@ -117,6 +127,27 @@ class NamesFragment : Fragment() {
                 presenter?.toggleFavorite(name)
                 checkbox.isChecked = presenter?.isFavorite(name) ?: false
             }
+        }
+
+        override fun getSectionForPosition(position: Int): Int {
+            if (position >= names.size) {
+                return 26
+            }
+
+            val s = names[position]
+            val element = s.first()
+            val sections = sections!!
+            val indexOf = sections.indexOf(element)
+            return if (indexOf >= 0 && indexOf < 26) indexOf else 26
+        }
+
+        override fun getSections(): Array<out Any>? {
+            return arrayOf('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+                    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '#')
+        }
+
+        override fun getPositionForSection(sectionIndex: Int): Int {
+            return 0
         }
 
         inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {}

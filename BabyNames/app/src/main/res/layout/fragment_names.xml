@@ -2,11 +2,38 @@
 <!--
   ~ Copyright (c) 2015 by David Hardy. Licensed under the Apache License, Version 2.0.
   -->
-
-<android.support.v7.widget.RecyclerView
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/recyclerView"
+    xmlns:recyclerviewfastscroller="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-</android.support.v7.widget.RecyclerView>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller
+        android:id="@+id/fastScroller"
+        android:layout_width="16dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true"
+        recyclerviewfastscroller:rfs_handleColor="@color/colorAccent"/>
+
+    <nl.endran.babynames.SectionIndicator
+        android:id="@+id/sectionIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/list_item_height"
+        android:layout_toStartOf="@id/fastScroller"
+
+        recyclerviewfastscroller:rfs_backgroundColor="@color/colorAccent"
+        recyclerviewfastscroller:rfs_textColor="@android:color/white"
+        />
+
+
+    <!--<attr name="rfs_barColor" format="color|reference" />-->
+    <!--<attr name="rfs_barBackground" format="reference" />-->
+    <!--<attr name="rfs_handleColor" format="color|reference" />-->
+    <!--<attr name="rfs_handleBackground" format="reference" />-->
+
+</RelativeLayout>

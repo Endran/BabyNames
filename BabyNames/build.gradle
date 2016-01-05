@@ -53,6 +53,7 @@ allprojects {
     ext.rxKotlinVersion = '0.30.1'
     ext.rxAndroidVersion = '1.1.0'
     ext.rxBindingVersion = '0.3.0'
+    ext.rxlifecycleVersion = '0.4.0'
     ext.rxPreferencesVersion = '1.0.1'
     ext.stethoVersion = '1.2.0'
     ext.timberVersion = '4.1.0'
