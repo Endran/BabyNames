@@ -15,8 +15,10 @@ import com.trello.rxlifecycle.components.support.RxFragment
 import kotlinx.android.synthetic.main.fragment_names.*
 import kotlinx.android.synthetic.main.row_item_name.view.*
 import nl.endran.babynames.R
+import nl.endran.babynames.SectionIndicator
 import nl.endran.babynames.injections.getAppComponent
 import nl.endran.babynames.names.BabyName
+import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller
 
 class NamesFragment : RxFragment() {
 
@@ -37,16 +39,15 @@ class NamesFragment : RxFragment() {
         }
     }
 
-
     private val adapter = NamesAdapter()
     private var presenter: NamesFragmentPresenter? = null
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater?.inflate(R.layout.fragment_names, container, false)
-    }
+        val view = inflater?.inflate(R.layout.fragment_names, container, false)
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        val fastScroller = view!!.findViewById(R.id.fastScroller) as VerticalRecyclerViewFastScroller
+        val recyclerView = view!!.findViewById(R.id.recyclerView) as RecyclerView
+        val sectionIndicator = view!!.findViewById(R.id.sectionIndicator) as SectionIndicator
 
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = adapter
@@ -54,7 +55,9 @@ class NamesFragment : RxFragment() {
         fastScroller.setRecyclerView(recyclerView);
         fastScroller.sectionIndicator = sectionIndicator;
 
-        // Connect the scroller to the recycler (to let the recycler scroll the scroller's handle)
+        recyclerView.addOnScrollListener(fastScroller.onScrollListener)
+
+        return view
     }
 
     override fun onDestroyView() {
