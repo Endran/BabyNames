@@ -14,7 +14,7 @@ import javax.inject.Singleton
 @Singleton
 open class FavoriteStorage @Inject constructor(@Named(AppModule.FAVORITE_STRING_SET_PREFERENCE) val favoriteStringSetPreference: Preference<Set<String>>) {
 
-    val favoritesObservable by lazy { favoriteStringSetPreference.asObservable() }
+    val favoritesObservable = favoriteStringSetPreference.asObservable()
 
     fun isFavorite(name: String): Boolean {
         return favoriteStringSetPreference.get().contains(name)

@@ -92,16 +92,23 @@ class NamesFragment : RxFragment() {
     }
 
     private fun addNewNames(names: MutableList<BabyName>) {
-        names.forEach {
-            if (!adapter.names.contains(it)) {
-                val index = names.indexOf(it)
-                adapter.names.add(index, it)
-                adapter.notifyItemInserted(index)
-            }
-        }
+        // Insert all names from the incoming list, that are not already in the adapter
+
+        names
+                // Filter out all names that are in the adapter and in the incoming list
+                .filter {
+                    !adapter.names.map { it.name }
+                            .contains(it.name)
+                }
+                // The add all remaining names to the adapter
+                .forEach {
+                    adapter.names.add(it)
+                    adapter.notifyItemInserted(adapter.names.size - 1)
+                }
     }
 
     private fun removeMissingNames(names: MutableList<BabyName>) {
+        // Remove all names from the adapter, that are missing already in the incoming list
         var itemsRemoved = 0
         for (i in adapter.names.indices) {
             if (names
