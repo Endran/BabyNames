@@ -4,7 +4,7 @@
 
 package nl.endran.babynames.fragments
 
-import com.f2prateek.rx.preferences.Preference
+import nl.endran.babynames.EPreference
 import nl.endran.babynames.extensions.ifContainsThenMinusElsePlus
 import nl.endran.babynames.names.BabyName
 import rx.Observable
@@ -14,7 +14,7 @@ import rx.lang.kotlin.toObservable
 
 class NamesFragmentPresenter constructor(
         val babyNameObservable: Observable<MutableList<BabyName>>,
-        val favoritesPreference: Preference<Set<String>>) {
+        val favoritesPreference: EPreference<Set<String>>) {
 
     private var namesFragment: NamesFragment? = null
     private var favoriteSubscription: Subscription? = null

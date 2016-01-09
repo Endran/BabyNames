@@ -21,6 +21,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import nl.endran.babynames.EPreference;
 
 @Module
 public class AppModule {
@@ -71,7 +72,8 @@ public class AppModule {
     @Singleton
     @Provides
     @Named(FAVORITES_PREFERENCE)
-    public Preference<Set<String>> provideFavoriteStringSetPreference(@NonNull final RxSharedPreferences rxSharedPreferences) {
-        return rxSharedPreferences.getStringSet(FAVORITES_PREFERENCE, new HashSet<String>());
+    public EPreference<Set<String>> provideFavoriteStringSetPreference(@NonNull final RxSharedPreferences rxSharedPreferences) {
+        Preference<Set<String>> favoritesPreference = rxSharedPreferences.getStringSet(FAVORITES_PREFERENCE, new HashSet<String>());
+        return EPreference.create(favoritesPreference);
     }
 }

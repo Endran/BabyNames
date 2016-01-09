@@ -5,6 +5,7 @@
 package nl.endran.babynames.fragments
 
 import com.f2prateek.rx.preferences.Preference
+import nl.endran.babynames.EPreference
 import nl.endran.babynames.injections.AppModule
 import nl.endran.babynames.names.BabyName
 import nl.endran.babynames.names.BabyNameExtractor
@@ -15,7 +16,7 @@ import javax.inject.Named
 
 class NamesUtilFactory @Inject constructor(
         val babyNameExtractor: BabyNameExtractor,
-        @Named(AppModule.FAVORITES_PREFERENCE) val favoritesPreference: Preference<Set<String>>) {
+        @Named(AppModule.FAVORITES_PREFERENCE) val favoritesPreference: EPreference<Set<String>>) {
 
     public enum class Type {
         ALPHABET, POPULARITY, FAVORITES
