@@ -1,10 +1,14 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
+
     repositories {
         jcenter()
+        maven { url "http://repository.jetbrains.com/all" }
         maven { url 'https://maven.fabric.io/public' }
+        mavenCentral()
     }
+
     dependencies {
         classpath 'com.android.tools.build:gradle:1.5.0'
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.11.3'
@@ -27,6 +31,7 @@ allprojects {
 
     repositories {
         jcenter()
+        maven { url "http://repository.jetbrains.com/all" }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
         maven { url "https://jitpack.io" }
         maven { url "https://maven.fabric.io/repo" }
@@ -41,6 +46,7 @@ allprojects {
     ext._versionCode = 1
 
     ext.appCompatVersion = '23.1.1'
+    ext.androidAssertJVersion = '1.1.1'
     ext.butterKnifeVersion = '7.0.1'
     ext.crashlyticsVersion = '2.5.3'
     ext.daggerVersion = '2.0.2'
@@ -48,6 +54,7 @@ allprojects {
     ext.jUnitVersion = '4.12'
     ext.javaxAnnotationVersion = '10.0-b28'
     ext.licenseDialogVersion = '1.8.0'
+    ext.mockitoVersion = '1.10.19'
     ext.playServicesVersion = '8.1.0'
     ext.rxJavaVersion = '1.1.0'
     ext.rxKotlinVersion = '0.30.1'

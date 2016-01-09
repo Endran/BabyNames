@@ -44,7 +44,7 @@ class NamesFragmentPresenter constructor(
     }
 
     fun isFavorite(name: String): Boolean {
-        return favoritesPreference.get().contains(name)
+        return favoritesPreference.get()?.contains(name) ?: false
     }
 
     fun toggleFavorite(name: String) {

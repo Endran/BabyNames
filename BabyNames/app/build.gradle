@@ -89,6 +89,11 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     testCompile "junit:junit:${jUnitVersion}"
+    testCompile "org.mockito:mockito-all:${mockitoVersion}"
+    testCompile "org.mockito:mockito-core:${mockitoVersion}"
+    testCompile("com.squareup.assertj:assertj-android:${androidAssertJVersion}"){
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
 }
 buildscript {
     ext.kotlin_version = '1.0.0-beta-4584'
