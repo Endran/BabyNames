@@ -5,10 +5,18 @@
 package nl.endran.babynames.injections;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
+import com.f2prateek.rx.preferences.Preference;
+import com.f2prateek.rx.preferences.RxSharedPreferences;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -17,6 +25,7 @@ import dagger.Provides;
 @Module
 public class AppModule {
 
+    public static final String FAVORITE_STRING_SET_PREFERENCE = "FAVORITE_STRING_SET_PREFERENCE";
     @NonNull
     private final Context context;
 
@@ -44,5 +53,14 @@ public class AppModule {
     @Provides
     public Resources provideResources(@NonNull final Context context) {
         return context.getResources();
+    }
+
+    @Singleton
+    @Provides
+    @Named(FAVORITE_STRING_SET_PREFERENCE)
+    public Preference<Set<String>> provideFavoriteStringSetPreference(@NonNull final Context context) {
+        SharedPreferences preferences = context.getSharedPreferences("FAVORITE_STORAGE", Context.MODE_PRIVATE);
+        final RxSharedPreferences rxSharedPreferences = RxSharedPreferences.create(preferences);
+        return rxSharedPreferences.getStringSet("FAVORITE_KEYS", new HashSet<String>());
     }
 }

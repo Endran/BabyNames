@@ -4,7 +4,6 @@
 
 package nl.endran.babynames.fragments
 
-import com.f2prateek.rx.preferences.Preference
 import nl.endran.babynames.names.BabyName
 import nl.endran.babynames.util.FavoriteStorage
 import rx.Observable
@@ -13,7 +12,7 @@ import rx.android.schedulers.AndroidSchedulers
 
 class NamesFragmentPresenter constructor(
         val babyNameObservable: Observable<MutableList<BabyName>>,
-        val favoritesObservable: Preference<Set<String>>,
+        val favoritesObservable: Observable<Set<String>>,
         val favoriteStorage: FavoriteStorage) {
 
     private var namesFragment: NamesFragment? = null
@@ -23,7 +22,6 @@ class NamesFragmentPresenter constructor(
         this.namesFragment = namesFragment
 
         favoritesObservable
-                .asObservable()
                 .subscribe { updateUI() }
 
         updateUI()

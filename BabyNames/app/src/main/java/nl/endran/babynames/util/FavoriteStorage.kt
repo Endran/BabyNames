@@ -4,34 +4,30 @@
 
 package nl.endran.babynames.util
 
-import android.content.Context
 import com.f2prateek.rx.preferences.Preference
-import com.f2prateek.rx.preferences.RxSharedPreferences
+import nl.endran.babynames.injections.AppModule
 import rx.lang.kotlin.toObservable
 import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Singleton
 
-class FavoriteStorage @Inject constructor(context: Context) {
+@Singleton
+open class FavoriteStorage @Inject constructor(@Named(AppModule.FAVORITE_STRING_SET_PREFERENCE) val favoriteStringSetPreference: Preference<Set<String>>) {
 
-    val favoritesObservable: Preference<Set<String>>
-
-    init {
-        val preferences = context.getSharedPreferences("FAVORITE_STORAGE", Context.MODE_PRIVATE)
-        val rxSharedPreferences = RxSharedPreferences.create(preferences)
-        favoritesObservable = rxSharedPreferences.getStringSet("FAVORITE_KEYS", hashSetOf(""))
-    }
+    val favoritesObservable by lazy { favoriteStringSetPreference.asObservable() }
 
     fun isFavorite(name: String): Boolean {
-        return favoritesObservable.get().contains(name)
+        return favoriteStringSetPreference.get().contains(name)
     }
 
     fun toggleFavorite(name: String) {
-        var favorites = favoritesObservable.get()
+        var favorites = favoriteStringSetPreference.get()
 
         favorites.toObservable()
                 .contains(name)
                 .subscribe {
                     favorites = if (it) favorites.minus(name) else favorites.plus(name)
-                    favoritesObservable.set(favorites)
+                    favoriteStringSetPreference.set(favorites)
                 }
     }
 }
