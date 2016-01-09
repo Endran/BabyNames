@@ -4,16 +4,18 @@
 
 package nl.endran.babynames.fragments
 
+import com.f2prateek.rx.preferences.Preference
+import nl.endran.babynames.injections.AppModule
 import nl.endran.babynames.names.BabyName
 import nl.endran.babynames.names.BabyNameExtractor
-import nl.endran.babynames.util.FavoriteStorage
 import rx.Observable
 import rx.schedulers.Schedulers
 import javax.inject.Inject
+import javax.inject.Named
 
 class NamesUtilFactory @Inject constructor(
         val babyNameExtractor: BabyNameExtractor,
-        val favoriteStorage: FavoriteStorage) {
+        @Named(AppModule.FAVORITES_PREFERENCE) val favoritesPreference: Preference<Set<String>>) {
 
     public enum class Type {
         ALPHABET, POPULARITY, FAVORITES
@@ -34,7 +36,7 @@ class NamesUtilFactory @Inject constructor(
                         .toSortedList { babyName1, babyName2 -> babyName1.place - babyName2.place }
             Type.FAVORITES ->
                 observable = babyNameObservable
-                        .filter { favoriteStorage.isFavorite(it.name) }
+                        .filter { favoritesPreference.get().contains(it.name) }
                         .toSortedList { name1, name2 -> name1.name.compareTo(name2.name) }
             else -> throw IllegalAccessException("Invalid value of type $type")
         }
@@ -45,8 +47,6 @@ class NamesUtilFactory @Inject constructor(
     fun createPresenter(type: Type): NamesFragmentPresenter {
         return NamesFragmentPresenter(
                 getBabyNameObservable(type),
-                favoriteStorage.favoritesObservable,
-                favoriteStorage)
+                favoritesPreference)
     }
-
 }

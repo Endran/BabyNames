@@ -4,16 +4,17 @@
 
 package nl.endran.babynames.fragments
 
+import com.f2prateek.rx.preferences.Preference
+import nl.endran.babynames.extensions.ifContainsThenMinusElsePlus
 import nl.endran.babynames.names.BabyName
-import nl.endran.babynames.util.FavoriteStorage
 import rx.Observable
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
+import rx.lang.kotlin.toObservable
 
 class NamesFragmentPresenter constructor(
         val babyNameObservable: Observable<MutableList<BabyName>>,
-        val favoritesObservable: Observable<Set<String>>,
-        val favoriteStorage: FavoriteStorage) {
+        val favoritesPreference: Preference<Set<String>>) {
 
     private var namesFragment: NamesFragment? = null
     private var favoriteSubscription: Subscription? = null
@@ -21,7 +22,7 @@ class NamesFragmentPresenter constructor(
     fun start(namesFragment: NamesFragment) {
         this.namesFragment = namesFragment
 
-        favoritesObservable
+        favoriteSubscription = favoritesPreference.asObservable()
                 .subscribe { updateUI() }
 
         updateUI()
@@ -43,10 +44,18 @@ class NamesFragmentPresenter constructor(
     }
 
     fun isFavorite(name: String): Boolean {
-        return favoriteStorage.isFavorite(name)
+        return favoritesPreference.get().contains(name)
     }
 
     fun toggleFavorite(name: String) {
-        favoriteStorage.toggleFavorite(name)
+        favoritesPreference.get().toObservable()
+                .toList()
+                .flatMap { it.ifContainsThenMinusElsePlus(name).toObservable() }
+                .toList()
+                .subscribe {
+                    favoritesPreference
+                            .asAction()
+                            .call(it.toSet())
+                }
     }
 }

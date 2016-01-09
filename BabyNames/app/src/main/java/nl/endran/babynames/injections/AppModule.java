@@ -25,7 +25,8 @@ import dagger.Provides;
 @Module
 public class AppModule {
 
-    public static final String FAVORITE_STRING_SET_PREFERENCE = "FAVORITE_STRING_SET_PREFERENCE";
+    public static final String FAVORITES_PREFERENCE = "FAVORITES_PREFERENCE";
+
     @NonNull
     private final Context context;
 
@@ -57,10 +58,20 @@ public class AppModule {
 
     @Singleton
     @Provides
-    @Named(FAVORITE_STRING_SET_PREFERENCE)
-    public Preference<Set<String>> provideFavoriteStringSetPreference(@NonNull final Context context) {
-        SharedPreferences preferences = context.getSharedPreferences("FAVORITE_STORAGE", Context.MODE_PRIVATE);
-        final RxSharedPreferences rxSharedPreferences = RxSharedPreferences.create(preferences);
-        return rxSharedPreferences.getStringSet("FAVORITE_KEYS", new HashSet<String>());
+    public SharedPreferences provideSharedPreferences(@NonNull final Context context) {
+        return context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
+    }
+
+    @Singleton
+    @Provides
+    public RxSharedPreferences provideRxSharedPreferences(@NonNull final SharedPreferences sharedPreferences) {
+        return RxSharedPreferences.create(sharedPreferences);
+    }
+
+    @Singleton
+    @Provides
+    @Named(FAVORITES_PREFERENCE)
+    public Preference<Set<String>> provideFavoriteStringSetPreference(@NonNull final RxSharedPreferences rxSharedPreferences) {
+        return rxSharedPreferences.getStringSet(FAVORITES_PREFERENCE, new HashSet<String>());
     }
 }
