@@ -5,6 +5,7 @@
 package nl.endran.babynames.util
 
 import com.f2prateek.rx.preferences.Preference
+import nl.endran.babynames.extensions.ifContainsThenMinusElsePlus
 import nl.endran.babynames.injections.AppModule
 import rx.lang.kotlin.toObservable
 import javax.inject.Inject
@@ -21,13 +22,14 @@ open class FavoriteStorage @Inject constructor(@Named(AppModule.FAVORITE_STRING_
     }
 
     fun toggleFavorite(name: String) {
-        var favorites = favoriteStringSetPreference.get()
-
-        favorites.toObservable()
-                .contains(name)
+        favoriteStringSetPreference.get().toObservable()
+                .toList()
+                .flatMap { it.ifContainsThenMinusElsePlus(name).toObservable() }
+                .toList()
                 .subscribe {
-                    favorites = if (it) favorites.minus(name) else favorites.plus(name)
-                    favoriteStringSetPreference.set(favorites)
+                    favoriteStringSetPreference
+                            .asAction()
+                            .call(it.toSet())
                 }
     }
 }
