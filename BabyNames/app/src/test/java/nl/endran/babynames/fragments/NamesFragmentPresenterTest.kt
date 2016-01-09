@@ -12,6 +12,7 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import rx.Observable
+import rx.lang.kotlin.toObservable
 
 class NamesFragmentPresenterTest : Spek() {
 
@@ -21,12 +22,20 @@ class NamesFragmentPresenterTest : Spek() {
     @Mock
     lateinit var favoritesPreferenceMock: EPreference<Set<String>>
 
+    @Mock
+    lateinit var stringSetMock: Set<String>
+
+    @Mock
+    lateinit var favoritesObservableMock: Observable<String>
+
     val TEST_NAME = "TEST_NAME"
 
     init {
         MockitoAnnotations.initMocks(this)
 
-        given ("a NamesFragmentPresenter with empty favorites") {
+        given ("a NamesFragmentPresenter with favorites excluding $TEST_NAME") {
+
+            Mockito.`when`(favoritesPreferenceMock.get()).thenReturn(hashSetOf("a", "b"))
             val presenter = NamesFragmentPresenter(babyNameObservableMock, favoritesPreferenceMock)
 
             on("asking if $TEST_NAME is a favorite") {
@@ -38,8 +47,11 @@ class NamesFragmentPresenterTest : Spek() {
             }
         }
 
-        given("a NamesFragmentPresenter with pre filled favorites") {
-            Mockito.`when`(favoritesPreferenceMock.get()).thenReturn(hashSetOf(TEST_NAME))
+        given("a NamesFragmentPresenter with as favorites only $TEST_NAME") {
+            Mockito.`when`(favoritesPreferenceMock.get()).thenReturn(stringSetMock)
+            Mockito.`when`(stringSetMock.contains(TEST_NAME)).thenReturn(true)
+//            Mockito.`when`(stringSetMock.toObservable()).thenReturn(favoritesObservableMock)
+
             val presenter = NamesFragmentPresenter(babyNameObservableMock, favoritesPreferenceMock)
 
             on("asking if $TEST_NAME is a favorite") {
@@ -49,6 +61,22 @@ class NamesFragmentPresenterTest : Spek() {
                     Assertions.assertThat(isNameFavorite).isTrue()
                 }
             }
+            //
+            //            on("toggling $TEST_NAME") {
+            //                presenter.toggleFavorite(TEST_NAME)
+            //
+            //                it("should save an empty set") {
+            //
+
+            //            InOrder inOrder = inOrder(firstMock, secondMock);
+            //
+            //            //following will make sure that firstMock was called before secondMock
+            //            inOrder.verify(firstMock).methodOne();
+            //            inOrder.verify(secondMock).methodTwo();
+
+
+            //                }
+            //            }
         }
     }
 }
