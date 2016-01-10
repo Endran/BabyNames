@@ -14,7 +14,7 @@ import nl.endran.babynames.R
 import nl.endran.babynames.names.BabyName
 
 class NamesAdapter : RecyclerView.Adapter<NamesAdapter.ViewHolder>(), SectionIndexer {
-    var names: MutableList<BabyName> = arrayListOf()
+    var names: List<BabyName> = listOf()
 
     var isFavorite: ((String) -> Boolean)? = null
     var toggleFavorite: ((String) -> Unit)? = null

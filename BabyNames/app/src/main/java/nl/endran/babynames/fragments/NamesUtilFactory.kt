@@ -4,7 +4,6 @@
 
 package nl.endran.babynames.fragments
 
-import com.f2prateek.rx.preferences.Preference
 import nl.endran.babynames.EPreference
 import nl.endran.babynames.injections.AppModule
 import nl.endran.babynames.names.BabyName
@@ -22,8 +21,8 @@ class NamesUtilFactory @Inject constructor(
         ALPHABET, POPULARITY, FAVORITES
     }
 
-    private fun getBabyNameObservable(type: Type): Observable<MutableList<BabyName>> {
-        var observable: Observable<MutableList<BabyName>>
+    private fun getBabyNameObservable(type: Type): Observable<List<BabyName>> {
+        var observable: Observable<List<BabyName>>
 
         val babyNameObservable = babyNameExtractor.babyNamesObservable
                 .subscribeOn(Schedulers.computation())
@@ -48,6 +47,7 @@ class NamesUtilFactory @Inject constructor(
     fun createPresenter(type: Type): NamesFragmentPresenter {
         return NamesFragmentPresenter(
                 getBabyNameObservable(type),
-                favoritesPreference)
+                favoritesPreference.asObservable(),
+                favoritesPreference.asAction())
     }
 }

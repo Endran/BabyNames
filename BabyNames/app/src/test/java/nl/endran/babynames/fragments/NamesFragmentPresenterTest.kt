@@ -4,39 +4,40 @@
 
 package nl.endran.babynames.fragments
 
-import nl.endran.babynames.EPreference
 import nl.endran.babynames.names.BabyName
 import org.assertj.core.api.Assertions
 import org.jetbrains.spek.api.Spek
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
-import rx.Observable
-import rx.lang.kotlin.toObservable
+import rx.functions.Action1
+import rx.lang.kotlin.toSingletonObservable
 
 class NamesFragmentPresenterTest : Spek() {
 
-    @Mock
-    lateinit var babyNameObservableMock: Observable<MutableList<BabyName>>
-
-    @Mock
-    lateinit var favoritesPreferenceMock: EPreference<Set<String>>
-
-    @Mock
-    lateinit var stringSetMock: Set<String>
-
-    @Mock
-    lateinit var favoritesObservableMock: Observable<String>
-
+    val RANDOM_NAME_1 = "RANDOM_NAME_1"
     val TEST_NAME = "TEST_NAME"
+    val RANDOM_NAME_2 = "RANDOM_NAME_2"
+
+    @Mock
+    lateinit var favoritesPreferenceAction: Action1<in Set<String>>
 
     init {
         MockitoAnnotations.initMocks(this)
 
-        given ("a NamesFragmentPresenter with favorites excluding $TEST_NAME") {
+        val babyNameRandom1 = BabyName(RANDOM_NAME_1, 1, 11)
+        val babyNameTest1 = BabyName(TEST_NAME, 2, 22)
+        val babyNameRandom2 = BabyName(RANDOM_NAME_2, 3, 33)
+        val babyNameObservable = listOf(babyNameRandom1, babyNameTest1, babyNameRandom2).toSingletonObservable()
 
-            Mockito.`when`(favoritesPreferenceMock.get()).thenReturn(hashSetOf("a", "b"))
-            val presenter = NamesFragmentPresenter(babyNameObservableMock, favoritesPreferenceMock)
+        val setExcludingTestName = setOf(RANDOM_NAME_1, RANDOM_NAME_2)
+        val setIncludingTestName = setOf(TEST_NAME, RANDOM_NAME_2)
+
+        val favoritesPreferenceObservableExcludingTestName = setExcludingTestName.toSingletonObservable()
+        val favoritesPreferenceObservableIncludingTestName = setIncludingTestName.toSingletonObservable()
+
+        given ("a NamesFragmentPresenter with favorites excluding $TEST_NAME") {
+            val presenter = NamesFragmentPresenter(babyNameObservable, favoritesPreferenceObservableExcludingTestName, favoritesPreferenceAction)
 
             on("asking if $TEST_NAME is a favorite") {
                 val isNameFavorite = presenter.isFavorite(TEST_NAME)
@@ -45,14 +46,18 @@ class NamesFragmentPresenterTest : Spek() {
                     Assertions.assertThat(isNameFavorite).isFalse()
                 }
             }
+
+            on("toggling favorite for $TEST_NAME") {
+                presenter.toggleFavorite(TEST_NAME)
+
+                it("should append current favorites with $TEST_NAME") {
+                    Mockito.verify(favoritesPreferenceAction).call(setExcludingTestName.plus(TEST_NAME))
+                }
+            }
         }
 
-        given("a NamesFragmentPresenter with as favorites only $TEST_NAME") {
-            Mockito.`when`(favoritesPreferenceMock.get()).thenReturn(stringSetMock)
-            Mockito.`when`(stringSetMock.contains(TEST_NAME)).thenReturn(true)
-//            Mockito.`when`(stringSetMock.toObservable()).thenReturn(favoritesObservableMock)
-
-            val presenter = NamesFragmentPresenter(babyNameObservableMock, favoritesPreferenceMock)
+        given("a NamesFragmentPresenter with as favorites including $TEST_NAME") {
+            val presenter = NamesFragmentPresenter(babyNameObservable, favoritesPreferenceObservableIncludingTestName, favoritesPreferenceAction)
 
             on("asking if $TEST_NAME is a favorite") {
                 val isNameFavorite = presenter.isFavorite(TEST_NAME)
@@ -61,22 +66,14 @@ class NamesFragmentPresenterTest : Spek() {
                     Assertions.assertThat(isNameFavorite).isTrue()
                 }
             }
-            //
-            //            on("toggling $TEST_NAME") {
-            //                presenter.toggleFavorite(TEST_NAME)
-            //
-            //                it("should save an empty set") {
-            //
 
-            //            InOrder inOrder = inOrder(firstMock, secondMock);
-            //
-            //            //following will make sure that firstMock was called before secondMock
-            //            inOrder.verify(firstMock).methodOne();
-            //            inOrder.verify(secondMock).methodTwo();
+            on("toggling favorite for $TEST_NAME") {
+                presenter.toggleFavorite(TEST_NAME)
 
-
-            //                }
-            //            }
+                it("should remove $TEST_NAME from favorites") {
+                    Mockito.verify(favoritesPreferenceAction).call(setIncludingTestName.minus(TEST_NAME))
+                }
+            }
         }
     }
 }

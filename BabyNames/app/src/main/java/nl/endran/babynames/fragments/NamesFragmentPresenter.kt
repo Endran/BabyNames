@@ -10,11 +10,13 @@ import nl.endran.babynames.names.BabyName
 import rx.Observable
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
+import rx.functions.Action1
 import rx.lang.kotlin.toObservable
 
 class NamesFragmentPresenter constructor(
-        val babyNameObservable: Observable<MutableList<BabyName>>,
-        val favoritesPreference: EPreference<Set<String>>) {
+        val babyNameObservable: Observable<List<BabyName>>,
+        val favoritesPreferenceObservable: Observable<Set<String>>,
+        val favoritesPreferenceAction: Action1<in Set<String>>) {
 
     private var namesFragment: NamesFragment? = null
     private var favoriteSubscription: Subscription? = null
@@ -22,7 +24,7 @@ class NamesFragmentPresenter constructor(
     fun start(namesFragment: NamesFragment) {
         this.namesFragment = namesFragment
 
-        favoriteSubscription = favoritesPreference.asObservable()
+        favoriteSubscription = favoritesPreferenceObservable
                 .subscribe { updateUI() }
 
         updateUI()
@@ -40,22 +42,23 @@ class NamesFragmentPresenter constructor(
                 .subscribe {
                     namesFragment?.showNames(it)
                 }
-        return
     }
 
     fun isFavorite(name: String): Boolean {
-        return favoritesPreference.get()?.contains(name) ?: false
+        var res = false
+        favoritesPreferenceObservable
+                .flatMap { it.toObservable() }
+                .contains(name)
+                .subscribe { res = it }
+        return res
     }
 
     fun toggleFavorite(name: String) {
-        favoritesPreference.get().toObservable()
+        favoritesPreferenceObservable
+                .take(1)
+                .flatMap { it.toObservable() }
                 .toList()
-                .flatMap { it.ifContainsThenMinusElsePlus(name).toObservable() }
-                .toList()
-                .subscribe {
-                    favoritesPreference
-                            .asAction()
-                            .call(it.toSet())
-                }
+                .map { it.ifContainsThenMinusElsePlus(name).toSet() }
+                .subscribe { favoritesPreferenceAction.call(it) }
     }
 }

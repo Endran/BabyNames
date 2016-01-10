@@ -81,7 +81,7 @@ class NamesFragment : RxFragment() {
         presenter = null
     }
 
-    fun showNames(names: MutableList<BabyName>) {
+    fun showNames(names: List<BabyName>) {
         if (adapter.names.isEmpty() || adapter.names.size == names.size) {
             showAllNames(names)
         } else if (adapter.names.size > names.size) {
@@ -91,7 +91,7 @@ class NamesFragment : RxFragment() {
         }
     }
 
-    private fun addNewNames(names: MutableList<BabyName>) {
+    private fun addNewNames(names: List<BabyName>) {
         // Insert all names from the incoming list, that are not already in the adapter
 
         names
@@ -102,26 +102,26 @@ class NamesFragment : RxFragment() {
                 }
                 // The add all remaining names to the adapter
                 .forEach {
-                    adapter.names.add(it)
+                    adapter.names = adapter.names.plus(it)
                     adapter.notifyItemInserted(adapter.names.size - 1)
                 }
     }
 
-    private fun removeMissingNames(names: MutableList<BabyName>) {
+    private fun removeMissingNames(names: List<BabyName>) {
         // Remove all names from the adapter, that are missing already in the incoming list
         var itemsRemoved = 0
         for (i in adapter.names.indices) {
             if (names
                     .filter { it.name == adapter.names[i - itemsRemoved].name }
                     .isEmpty()) {
-                adapter.names.removeAt(i - itemsRemoved)
+                adapter.names = adapter.names.minus(adapter.names[i - itemsRemoved])
                 adapter.notifyItemRemoved(i - itemsRemoved)
                 itemsRemoved++
             }
         }
     }
 
-    private fun showAllNames(names: MutableList<BabyName>) {
+    private fun showAllNames(names: List<BabyName>) {
         adapter.names = names
         adapter.notifyDataSetChanged()
     }
