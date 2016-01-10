@@ -10,12 +10,14 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.trello.rxlifecycle.RxLifecycle
 import com.trello.rxlifecycle.components.support.RxFragment
 import kotlinx.android.synthetic.main.fragment_names.*
 import nl.endran.babynames.R
 import nl.endran.babynames.SectionIndicator
 import nl.endran.babynames.injections.getAppComponent
 import nl.endran.babynames.names.BabyName
+import rx.android.schedulers.AndroidSchedulers
 import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller
 
 class NamesFragment : RxFragment() {
@@ -38,7 +40,7 @@ class NamesFragment : RxFragment() {
     }
 
     private val adapter = NamesAdapter()
-    private var presenter: NamesFragmentPresenter? = null
+    private lateinit var presenter: NamesFragmentPresenter
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater!!.inflate(R.layout.fragment_names, container, false)
@@ -47,8 +49,8 @@ class NamesFragment : RxFragment() {
         val recyclerView = view.findViewById(R.id.recyclerView) as RecyclerView
         val sectionIndicator = view.findViewById(R.id.sectionIndicator) as SectionIndicator
 
-        adapter.isFavorite = { presenter?.isFavorite(it) ?: false }
-        adapter.toggleFavorite = { presenter?.toggleFavorite(it) }
+        adapter.isFavorite = { presenter.isFavorite(it) }
+        adapter.toggleFavorite = { presenter.toggleFavorite(it) }
 
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = adapter
@@ -58,27 +60,22 @@ class NamesFragment : RxFragment() {
 
         recyclerView.addOnScrollListener(fastScroller.onScrollListener)
 
+        val appComponent = context.getAppComponent()
+        val namesUtilFactory = appComponent.namesUtilFactory
+        presenter = namesUtilFactory.createPresenter(getType(arguments))
+        presenter.start()
+        presenter.nameSubject
+                .compose(RxLifecycle.bindFragment<List<BabyName>>(lifecycle()))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ showNames(it) })
+
         return view
     }
 
     override fun onDestroyView() {
+        presenter.stop()
         recyclerView.removeOnScrollListener(fastScroller.onScrollListener);
         super.onDestroyView()
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        val appComponent = context.getAppComponent()
-        val namesUtilFactory = appComponent.namesUtilFactory
-        presenter = namesUtilFactory.createPresenter(getType(arguments))
-        presenter?.start(this)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        presenter?.stop()
-        presenter = null
     }
 
     fun showNames(names: List<BabyName>) {
@@ -125,5 +122,4 @@ class NamesFragment : RxFragment() {
         adapter.names = names
         adapter.notifyDataSetChanged()
     }
-
 }

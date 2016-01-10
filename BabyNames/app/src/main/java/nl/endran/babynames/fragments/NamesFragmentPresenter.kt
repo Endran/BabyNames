@@ -4,13 +4,12 @@
 
 package nl.endran.babynames.fragments
 
-import nl.endran.babynames.EPreference
 import nl.endran.babynames.extensions.ifContainsThenMinusElsePlus
 import nl.endran.babynames.names.BabyName
 import rx.Observable
 import rx.Subscription
-import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
+import rx.lang.kotlin.BehaviourSubject
 import rx.lang.kotlin.toObservable
 
 class NamesFragmentPresenter constructor(
@@ -18,31 +17,31 @@ class NamesFragmentPresenter constructor(
         val favoritesPreferenceObservable: Observable<Set<String>>,
         val favoritesPreferenceAction: Action1<in Set<String>>) {
 
-    private var namesFragment: NamesFragment? = null
     private var favoriteSubscription: Subscription? = null
 
-    fun start(namesFragment: NamesFragment) {
-        this.namesFragment = namesFragment
+    public val nameSubject = BehaviourSubject<List<BabyName>>()
 
+    fun start() {
         favoriteSubscription = favoritesPreferenceObservable
-                .subscribe { updateUI() }
+                .subscribe {
+                    informSubject()
+                }
 
-        updateUI()
+        informSubject()
+    }
+
+    private fun informSubject() {
+        babyNameObservable
+                .subscribe {
+                    nameSubject.onNext(it)
+                }
     }
 
     fun stop() {
         favoriteSubscription?.unsubscribe()
         favoriteSubscription = null
-        namesFragment = null
     }
 
-    private fun updateUI() {
-        babyNameObservable
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    namesFragment?.showNames(it)
-                }
-    }
 
     fun isFavorite(name: String): Boolean {
         var res = false
