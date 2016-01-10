@@ -47,6 +47,7 @@ class NamesFragmentPresenter constructor(
     fun isFavorite(name: String): Boolean {
         var res = false
         favoritesPreferenceObservable
+                .take(1)
                 .flatMap { it.toObservable() }
                 .contains(name)
                 .subscribe { res = it }

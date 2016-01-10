@@ -9,6 +9,8 @@ import nl.endran.babynames.injections.AppModule
 import nl.endran.babynames.names.BabyName
 import nl.endran.babynames.names.BabyNameExtractor
 import rx.Observable
+import rx.lang.kotlin.toObservable
+import rx.lang.kotlin.toSingletonObservable
 import rx.schedulers.Schedulers
 import javax.inject.Inject
 import javax.inject.Named
@@ -24,18 +26,15 @@ class NamesUtilFactory @Inject constructor(
     private fun getBabyNameObservable(type: Type): Observable<List<BabyName>> {
         var observable: Observable<List<BabyName>>
 
-        val babyNameObservable = babyNameExtractor.babyNamesObservable
-                .subscribeOn(Schedulers.computation())
-
         when (type) {
             Type.ALPHABET ->
-                observable = babyNameObservable
+                observable = babyNameExtractor.observable
                         .toSortedList { name1, name2 -> name1.name.compareTo(name2.name) }
             Type.POPULARITY ->
-                observable = babyNameObservable
+                observable = babyNameExtractor.observable
                         .toSortedList { babyName1, babyName2 -> babyName1.place - babyName2.place }
             Type.FAVORITES ->
-                observable = babyNameObservable
+                observable = babyNameExtractor.observable
                         .filter { favoritesPreference.get().contains(it.name) }
                         .toSortedList { name1, name2 -> name1.name.compareTo(name2.name) }
             else -> throw IllegalAccessException("Invalid value of type $type")
