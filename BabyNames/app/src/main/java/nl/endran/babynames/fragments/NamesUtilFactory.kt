@@ -4,20 +4,18 @@
 
 package nl.endran.babynames.fragments
 
-import nl.endran.babynames.EPreference
+import android.widget.SectionIndexer
+import com.f2prateek.rx.preferences.Preference
 import nl.endran.babynames.injections.AppModule
 import nl.endran.babynames.names.BabyName
 import nl.endran.babynames.names.BabyNameExtractor
 import rx.Observable
-import rx.lang.kotlin.toObservable
-import rx.lang.kotlin.toSingletonObservable
-import rx.schedulers.Schedulers
 import javax.inject.Inject
 import javax.inject.Named
 
 class NamesUtilFactory @Inject constructor(
         val babyNameExtractor: BabyNameExtractor,
-        @Named(AppModule.FAVORITES_PREFERENCE) val favoritesPreference: EPreference<Set<String>>) {
+        @Named(AppModule.FAVORITES_PREFERENCE) val favoritesPreference: Preference<Set<String>>) {
 
     public enum class Type {
         ALPHABET, POPULARITY, FAVORITES
