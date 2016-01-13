@@ -4,12 +4,17 @@
 
 package nl.endran.babynames.injections;
 
+import com.f2prateek.rx.preferences.Preference;
+
+import java.util.Set;
+
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Component;
 import nl.endran.babynames.App;
 import nl.endran.babynames.MainActivity;
-import nl.endran.babynames.fragments.NamesUtilFactory;
+import nl.endran.babynames.names.BabyNameExtractor;
 import nl.endran.babynames.tracking.Tracking;
 
 @Singleton
@@ -22,5 +27,8 @@ public interface AppComponent {
 
     Tracking getTracking();
 
-    NamesUtilFactory getNamesUtilFactory();
+    BabyNameExtractor getBabyNameExtractor();
+
+    @Named(AppModule.FAVORITES_PREFERENCE)
+    Preference<Set<String>> getFavoritesPreference();
 }

@@ -26,11 +26,5 @@ public class SectionIndicator extends SectionTitleIndicator<Object> {
     @Override
     public void setSection(final Object object) {
         setTitleText(object.toString());
-//        setTitleText(colorGroup.getName().charAt(0) + "");
-
-        // Example of using a longer string
-        // setTitleText(colorGroup.getName());
-
-//        setIndicatorTextColor(colorGroup.getAsColor());
     }
 }

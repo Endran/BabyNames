@@ -15,31 +15,16 @@ import com.trello.rxlifecycle.components.support.RxFragment
 import kotlinx.android.synthetic.main.fragment_names.*
 import nl.endran.babynames.R
 import nl.endran.babynames.SectionIndicator
+import nl.endran.babynames.injections.AppComponent
 import nl.endran.babynames.injections.getAppComponent
 import nl.endran.babynames.names.BabyName
+import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller
 
-class NamesFragment : RxFragment() {
+abstract class NamesFragment : RxFragment() {
 
-    companion object {
-
-        val TYPE_KEY = "TYPE_KEY"
-
-        fun createFragment(type: NamesUtilFactory.Type): NamesFragment {
-            val fragment = NamesFragment()
-            fragment.arguments = Bundle()
-            fragment.arguments.putInt(TYPE_KEY, type.ordinal)
-            return fragment
-        }
-
-        fun getType(arguments: Bundle): NamesUtilFactory.Type {
-            val typeOrdinal = arguments.getInt(TYPE_KEY, 0)
-            return NamesUtilFactory.Type.values()[typeOrdinal]
-        }
-    }
-
-    private val adapter = NamesAdapter()
+    private val adapter = AlphabetNamesAdapter()
     private lateinit var presenter: NamesFragmentPresenter
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -61,8 +46,10 @@ class NamesFragment : RxFragment() {
         recyclerView.addOnScrollListener(fastScroller.onScrollListener)
 
         val appComponent = context.getAppComponent()
-        val namesUtilFactory = appComponent.namesUtilFactory
-        presenter = namesUtilFactory.createPresenter(getType(arguments))
+        val babyNameObservable = getBabyNameObservable(appComponent)
+        val favoritesPreference = appComponent.favoritesPreference
+
+        presenter = NamesFragmentPresenter(babyNameObservable, favoritesPreference.asObservable(), favoritesPreference.asAction())
         presenter.start()
         presenter.nameSubject
                 .compose(RxLifecycle.bindFragment<List<BabyName>>(lifecycle()))
@@ -71,6 +58,8 @@ class NamesFragment : RxFragment() {
 
         return view
     }
+
+    abstract fun getBabyNameObservable(appComponent: AppComponent): Observable<List<BabyName>>
 
     override fun onDestroyView() {
         presenter.stop()

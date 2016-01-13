@@ -5,7 +5,6 @@
 package nl.endran.babynames.fragments
 
 import android.support.v7.widget.RecyclerView
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SectionIndexer
@@ -14,7 +13,7 @@ import nl.endran.babynames.R
 import nl.endran.babynames.injections.getLayoutInflater
 import nl.endran.babynames.names.BabyName
 
-class AlphabetNamesAdapter : RecyclerView.Adapter<AlphabetNamesAdapter.ViewHolder>(), SectionIndexer {
+class PopularNamesAdapter : RecyclerView.Adapter<PopularNamesAdapter.ViewHolder>(), SectionIndexer {
     var names: List<BabyName> = listOf()
 
     var isFavorite: ((String) -> Boolean)? = null
@@ -33,7 +32,7 @@ class AlphabetNamesAdapter : RecyclerView.Adapter<AlphabetNamesAdapter.ViewHolde
         val name = names[position]
 
         val itemView = holder.itemView
-        itemView.textView.text = name.name
+        itemView.textView.text = "${name.place}. ${name.name}"
 
         val checkbox = itemView.checkbox
         checkbox.isClickable = false
@@ -44,19 +43,9 @@ class AlphabetNamesAdapter : RecyclerView.Adapter<AlphabetNamesAdapter.ViewHolde
         }
     }
 
-    override fun getSectionForPosition(position: Int): Int {
-        if (position >= names.size) {
-            return 26
-        }
+    override fun getSectionForPosition(position: Int) = 0
 
-        val indexOf = sections!!.indexOf(names[position].name.first())
-        return if (indexOf >= 0 && indexOf < 26) indexOf else 26
-    }
-
-    override fun getSections(): Array<out Any>? {
-        return arrayOf('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-                'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '#')
-    }
+    override fun getSections(): Array<out Any>? = arrayOf("")
 
     override fun getPositionForSection(sectionIndex: Int) = 0
 
