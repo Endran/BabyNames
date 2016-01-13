@@ -15,4 +15,6 @@ class FavoriteNamesFragment : NamesFragment() {
                 .filter { appComponent.favoritesPreference.get().contains(it.name) }
                 .toSortedList { name1, name2 -> name1.name.compareTo(name2.name) }
     }
+
+    override fun getNamesAdapter() = PopularNamesAdapter()
 }

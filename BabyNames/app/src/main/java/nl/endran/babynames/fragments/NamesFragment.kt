@@ -24,7 +24,7 @@ import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScrol
 
 abstract class NamesFragment : RxFragment() {
 
-    private val adapter = AlphabetNamesAdapter()
+    private lateinit var adapter: NamesAdapter
     private lateinit var presenter: NamesFragmentPresenter
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -34,6 +34,7 @@ abstract class NamesFragment : RxFragment() {
         val recyclerView = view.findViewById(R.id.recyclerView) as RecyclerView
         val sectionIndicator = view.findViewById(R.id.sectionIndicator) as SectionIndicator
 
+        adapter = getNamesAdapter()
         adapter.isFavorite = { presenter.isFavorite(it) }
         adapter.toggleFavorite = { presenter.toggleFavorite(it) }
 
@@ -58,6 +59,8 @@ abstract class NamesFragment : RxFragment() {
 
         return view
     }
+
+    abstract  fun getNamesAdapter(): NamesAdapter
 
     abstract fun getBabyNameObservable(appComponent: AppComponent): Observable<List<BabyName>>
 

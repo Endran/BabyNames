@@ -14,4 +14,6 @@ class PopularNamesFragment : NamesFragment() {
         return  appComponent.babyNameExtractor.observable
                 .toSortedList { babyName1, babyName2 -> babyName1.place - babyName2.place }
     }
+
+    override fun getNamesAdapter() = PopularNamesAdapter()
 }

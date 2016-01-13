@@ -11,7 +11,9 @@ import rx.Observable
 class AlphabetNamesFragment : NamesFragment() {
 
     override fun getBabyNameObservable(appComponent: AppComponent): Observable<List<BabyName>> {
-        return  appComponent.babyNameExtractor.observable
+        return appComponent.babyNameExtractor.observable
                 .toSortedList { name1, name2 -> name1.name.compareTo(name2.name) }
     }
+
+    override fun getNamesAdapter() = AlphabetNamesAdapter()
 }
