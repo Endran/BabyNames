@@ -13,18 +13,23 @@ import rx.schedulers.Schedulers
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class BabyNameExtractor @Inject constructor(val resources: Resources) {
+enum class FavoriteState {
+    NOPE, FAVORITE, DEPRECATED
+}
 
-    private val babyNames by lazy {
+data class BabyCollection(val year: Int, val names: List<Baby>);
+data class Baby(val name: String, val count: Int, val place: Int, var favoriteState: FavoriteState = FavoriteState.NOPE);
+
+class BabyExtractor @Inject constructor(val resources: Resources) {
+    private val babies by lazy {
         Gson().fromJson(
                 BufferedReader(InputStreamReader(
-                        resources.openRawResource(R.raw.boy_names))), BabyNames::class.java)
+                        resources.openRawResource(R.raw.boy_names))), BabyCollection::class.java).names
     }
 
     val observable = this.toSingletonObservable()
             .subscribeOn(Schedulers.computation())
-            .flatMap { it.babyNames.names.toObservable() }
+            .flatMap { it.babies.toObservable() }
+
 }

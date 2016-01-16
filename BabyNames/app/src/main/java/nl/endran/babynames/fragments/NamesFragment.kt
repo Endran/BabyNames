@@ -17,7 +17,7 @@ import nl.endran.babynames.R
 import nl.endran.babynames.SectionIndicator
 import nl.endran.babynames.injections.AppComponent
 import nl.endran.babynames.injections.getAppComponent
-import nl.endran.babynames.names.BabyName
+import nl.endran.babynames.names.Baby
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller
@@ -47,22 +47,22 @@ abstract class NamesFragment : RxFragment() {
         recyclerView.addOnScrollListener(fastScroller.onScrollListener)
 
         val appComponent = context.getAppComponent()
-        val babyNameObservable = getBabyNameObservable(appComponent)
+        val babyObservable = getBabiesObservable(appComponent)
         val favoritesPreference = appComponent.favoritesPreference
 
-        presenter = NamesFragmentPresenter(babyNameObservable, favoritesPreference.asObservable(), favoritesPreference.asAction())
+        presenter = NamesFragmentPresenter(babyObservable, favoritesPreference.asObservable(), favoritesPreference.asAction())
         presenter.start()
         presenter.nameSubject
-                .compose(RxLifecycle.bindFragment<List<BabyName>>(lifecycle()))
+                .compose(RxLifecycle.bindFragment<List<Baby>>(lifecycle()))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ adapter.updateNames(it) })
+                .subscribe({ adapter.updateBabies(it) })
 
         return view
     }
 
     abstract fun getNamesAdapter(): NamesAdapter
 
-    abstract fun getBabyNameObservable(appComponent: AppComponent): Observable<List<BabyName>>
+    abstract fun getBabiesObservable(appComponent: AppComponent): Observable<List<Baby>>
 
     override fun onDestroyView() {
         adapter.isFavorite = null;

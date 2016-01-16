@@ -17,17 +17,17 @@ class PopularNamesAdapter : NamesAdapter() {
     }
 
     override fun onBindViewHolder(holder: NamesAdapter.ViewHolder, position: Int) {
-        val name = names[position]
+        val baby = babies[position]
 
         val itemView = holder.itemView
-        itemView.textView.text = "${name.place}. ${name.name}"
+        itemView.textView.text = "${baby.place}. ${baby.name}"
 
         val checkbox = itemView.checkbox
         checkbox.isClickable = false
-        checkbox.isChecked = isFavorite?.invoke(name.name) ?: false;
+        checkbox.isChecked = isFavorite?.invoke(baby.name) ?: false;
         itemView.setOnClickListener {
-            toggleFavorite?.invoke(name.name)
-            checkbox.isChecked = isFavorite?.invoke(name.name) ?: false;
+            toggleFavorite?.invoke(baby.name)
+            checkbox.isChecked = isFavorite?.invoke(baby.name) ?: false;
         }
     }
 

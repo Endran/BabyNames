@@ -14,7 +14,7 @@ import javax.inject.Singleton;
 import dagger.Component;
 import nl.endran.babynames.App;
 import nl.endran.babynames.MainActivity;
-import nl.endran.babynames.names.BabyNameExtractor;
+import nl.endran.babynames.names.BabyExtractor;
 import nl.endran.babynames.tracking.Tracking;
 
 @Singleton
@@ -27,7 +27,7 @@ public interface AppComponent {
 
     Tracking getTracking();
 
-    BabyNameExtractor getBabyNameExtractor();
+    BabyExtractor getBabyExtractor();
 
     @Named(AppModule.FAVORITES_PREFERENCE)
     Preference<Set<String>> getFavoritesPreference();

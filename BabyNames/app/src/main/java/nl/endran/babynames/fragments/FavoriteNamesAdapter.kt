@@ -4,12 +4,13 @@
 
 package nl.endran.babynames.fragments
 
+import android.graphics.Paint
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.row_item_name.view.*
 import nl.endran.babynames.R
 import nl.endran.babynames.injections.getLayoutInflater
 
-class AlphabetNamesAdapter : NamesAdapter() {
+class FavoriteNamesAdapter(val isDeprecated: ((String) -> Boolean)) : NamesAdapter() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NamesAdapter.ViewHolder {
         val view = parent.getLayoutInflater().inflate(R.layout.row_item_name, parent, false)
@@ -20,28 +21,29 @@ class AlphabetNamesAdapter : NamesAdapter() {
         val name = babies[position]
 
         val itemView = holder.itemView
-        itemView.textView.text = name.name
+        itemView.textView.text = "${name.place}. ${name.name}"
 
         val checkbox = itemView.checkbox
         checkbox.isClickable = false
         checkbox.isChecked = isFavorite?.invoke(name.name) ?: false;
         itemView.setOnClickListener {
+            val paintFlags: Int
+//            if (isDeprecated(name.name)) {
+                paintFlags = itemView.textView.paintFlags.or(Paint.STRIKE_THRU_TEXT_FLAG)
+//            } else {
+//                paintFlags = itemView.textView.paintFlags.and(Paint.STRIKE_THRU_TEXT_FLAG.inv())
+//            }
+            itemView.textView.paintFlags = paintFlags
+        }
+
+        itemView.setOnLongClickListener {
             toggleFavorite?.invoke(name.name)
             checkbox.isChecked = isFavorite?.invoke(name.name) ?: false;
+            return@setOnLongClickListener true
         }
     }
 
-    override fun getSectionForPosition(position: Int): Int {
-        if (position >= babies.size) {
-            return 26
-        }
+    override fun getSectionForPosition(position: Int) = 0
 
-        val indexOf = sections!!.indexOf(babies[position].name.first())
-        return if (indexOf >= 0 && indexOf < 26) indexOf else 26
-    }
-
-    override fun getSections(): Array<out Any>? {
-        return arrayOf('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-                'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '#')
-    }
+    override fun getSections(): Array<out Any>? = arrayOf("")
 }

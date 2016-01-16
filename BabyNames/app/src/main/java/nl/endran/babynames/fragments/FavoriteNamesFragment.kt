@@ -5,15 +5,15 @@
 package nl.endran.babynames.fragments
 
 import nl.endran.babynames.injections.AppComponent
-import nl.endran.babynames.names.BabyName
+import nl.endran.babynames.names.Baby
 import rx.Observable
 
 class FavoriteNamesFragment : NamesFragment() {
 
-    override fun getBabyNameObservable(appComponent: AppComponent): Observable<List<BabyName>> {
-        return  appComponent.babyNameExtractor.observable
+    override fun getBabiesObservable(appComponent: AppComponent): Observable<List<Baby>> {
+        return appComponent.babyExtractor.observable
                 .filter { appComponent.favoritesPreference.get().contains(it.name) }
-                .toSortedList { name1, name2 -> name1.name.compareTo(name2.name) }
+                .toSortedList { baby1, baby2 -> baby1.name.compareTo(baby2.name) }
     }
 
     override fun getNamesAdapter() = PopularNamesAdapter()

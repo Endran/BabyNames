@@ -5,7 +5,7 @@
 package nl.endran.babynames.fragments
 
 import nl.endran.babynames.extensions.ifContainsThenMinusElsePlus
-import nl.endran.babynames.names.BabyName
+import nl.endran.babynames.names.Baby
 import rx.Observable
 import rx.Subscription
 import rx.functions.Action1
@@ -13,13 +13,13 @@ import rx.lang.kotlin.BehaviourSubject
 import rx.lang.kotlin.toObservable
 
 class NamesFragmentPresenter constructor(
-        val babyNameObservable: Observable<List<BabyName>>,
+        val babiesObservable: Observable<List<Baby>>,
         val favoritesPreferenceObservable: Observable<Set<String>>,
         val favoritesPreferenceAction: Action1<in Set<String>>) {
 
     private var favoriteSubscription: Subscription? = null
 
-    public val nameSubject = BehaviourSubject<List<BabyName>>()
+    public val nameSubject = BehaviourSubject<List<Baby>>()
 
     fun start() {
         favoriteSubscription = favoritesPreferenceObservable
@@ -31,7 +31,7 @@ class NamesFragmentPresenter constructor(
     }
 
     private fun informSubject() {
-        babyNameObservable
+        babiesObservable
                 .subscribe {
                     nameSubject.onNext(it)
                 }
