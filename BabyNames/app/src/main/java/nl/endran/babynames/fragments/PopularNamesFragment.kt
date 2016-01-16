@@ -11,7 +11,8 @@ import rx.Observable
 class PopularNamesFragment : NamesFragment() {
 
     override fun getBabyNameObservable(appComponent: AppComponent): Observable<List<BabyName>> {
-        return  appComponent.babyNameExtractor.observable
+        return appComponent.babyNameExtractor.observable
+                .filter { it.count >= 5 }
                 .toSortedList { babyName1, babyName2 -> babyName1.place - babyName2.place }
     }
 

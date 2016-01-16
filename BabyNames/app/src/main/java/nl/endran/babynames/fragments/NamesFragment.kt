@@ -55,63 +55,22 @@ abstract class NamesFragment : RxFragment() {
         presenter.nameSubject
                 .compose(RxLifecycle.bindFragment<List<BabyName>>(lifecycle()))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ showNames(it) })
+                .subscribe({ adapter.updateNames(it) })
 
         return view
     }
 
-    abstract  fun getNamesAdapter(): NamesAdapter
+    abstract fun getNamesAdapter(): NamesAdapter
 
     abstract fun getBabyNameObservable(appComponent: AppComponent): Observable<List<BabyName>>
 
     override fun onDestroyView() {
-        presenter.stop()
+        adapter.isFavorite = null;
+        adapter.toggleFavorite = null;
         recyclerView.removeOnScrollListener(fastScroller.onScrollListener);
+        presenter.stop()
         super.onDestroyView()
     }
 
-    fun showNames(names: List<BabyName>) {
-        if (adapter.names.isEmpty() || adapter.names.size == names.size) {
-            showAllNames(names)
-        } else if (adapter.names.size > names.size) {
-            removeMissingNames(names)
-        } else if (adapter.names.size < names.size) {
-            addNewNames(names)
-        }
-    }
 
-    private fun addNewNames(names: List<BabyName>) {
-        // Insert all names from the incoming list, that are not already in the adapter
-
-        names
-                // Filter out all names that are in the adapter and in the incoming list
-                .filter {
-                    !adapter.names.map { it.name }
-                            .contains(it.name)
-                }
-                // The add all remaining names to the adapter
-                .forEach {
-                    adapter.names = adapter.names.plus(it)
-                    adapter.notifyItemInserted(adapter.names.size - 1)
-                }
-    }
-
-    private fun removeMissingNames(names: List<BabyName>) {
-        // Remove all names from the adapter, that are missing already in the incoming list
-        var itemsRemoved = 0
-        for (i in adapter.names.indices) {
-            if (names
-                    .filter { it.name == adapter.names[i - itemsRemoved].name }
-                    .isEmpty()) {
-                adapter.names = adapter.names.minus(adapter.names[i - itemsRemoved])
-                adapter.notifyItemRemoved(i - itemsRemoved)
-                itemsRemoved++
-            }
-        }
-    }
-
-    private fun showAllNames(names: List<BabyName>) {
-        adapter.names = names
-        adapter.notifyDataSetChanged()
-    }
 }
